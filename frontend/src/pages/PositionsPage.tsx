@@ -24,18 +24,20 @@ import {
     KeyboardArrowUp as KeyboardArrowUpIcon,
     CheckCircle as CheckCircleIcon,
     RateReview as RateReviewIcon,
+    Info as InfoIcon,
 } from '@mui/icons-material';
 import { fetchPositions, settleTrade, addTrade } from '../features/trades/tradeSlice';
 import { RootState, AppDispatch } from '../features/store';
 import SettleTradeDialog from '../components/SettleTradeDialog';
 import TradeDialog from '../components/TradeDialog';
 import ReflectionDialog from '../components/ReflectionDialog';
+import RationaleViewDialog from '../components/RationaleViewDialog';
 import { Trade, Position, TradeClose, TradeCreate, TradeUpdate } from '../services/tradeService';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Button } from '@mui/material';
 
-const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void, onReflect: (trade: Trade) => void, showProfitLoss: boolean }) => {
-    const { position, onSettle, onReflect, showProfitLoss } = props;
+const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void, onReflect: (trade: Trade) => void, onViewRationale: (trade: Trade) => void, showProfitLoss: boolean }) => {
+    const { position, onSettle, onReflect, onViewRationale, showProfitLoss } = props;
     const [open, setOpen] = useState(false);
 
     // Find the entry trade (trade without related_trade_id)
@@ -120,17 +122,30 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                                                 </Tooltip>
                                             </TableCell>
                                             <TableCell align="center">
-                                                {trade.status === 'OPEN' && (
-                                                    <Tooltip title="この取引を決済する">
-                                                        <IconButton
-                                                            size="small"
-                                                            color="primary"
-                                                            onClick={() => onSettle(trade)}
-                                                        >
-                                                            <CheckCircleIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
+                                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                                                    {!trade.related_trade_id && (
+                                                        <Tooltip title="エントリー根拠を確認">
+                                                            <IconButton
+                                                                size="small"
+                                                                color="info"
+                                                                onClick={() => onViewRationale(trade)}
+                                                            >
+                                                                <InfoIcon />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
+                                                    {trade.status === 'OPEN' && (
+                                                        <Tooltip title="この取引を決済する">
+                                                            <IconButton
+                                                                size="small"
+                                                                color="primary"
+                                                                onClick={() => onSettle(trade)}
+                                                            >
+                                                                <CheckCircleIcon />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    )}
+                                                </Box>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -150,6 +165,7 @@ const PositionsPage: React.FC = () => {
     const [settleDialogOpen, setSettleDialogOpen] = useState(false);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [reflectionDialogOpen, setReflectionDialogOpen] = useState(false);
+    const [rationaleDialogOpen, setRationaleDialogOpen] = useState(false);
     const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
     const [tabValue, setTabValue] = useState(0);
 
@@ -199,6 +215,16 @@ const PositionsPage: React.FC = () => {
 
     const handleReflectionDialogClose = () => {
         setReflectionDialogOpen(false);
+        setSelectedTrade(null);
+    };
+
+    const handleViewRationaleClick = (trade: Trade) => {
+        setSelectedTrade(trade);
+        setRationaleDialogOpen(true);
+    };
+
+    const handleRationaleDialogClose = () => {
+        setRationaleDialogOpen(false);
         setSelectedTrade(null);
     };
 
@@ -264,6 +290,7 @@ const PositionsPage: React.FC = () => {
                                     position={position}
                                     onSettle={handleSettleClick}
                                     onReflect={handleReflectClick}
+                                    onViewRationale={handleViewRationaleClick}
                                     showProfitLoss={tabValue === 1}
                                 />
                             ))
@@ -289,6 +316,12 @@ const PositionsPage: React.FC = () => {
             <ReflectionDialog
                 open={reflectionDialogOpen}
                 onClose={handleReflectionDialogClose}
+                trade={selectedTrade}
+            />
+
+            <RationaleViewDialog
+                open={rationaleDialogOpen}
+                onClose={handleRationaleDialogClose}
                 trade={selectedTrade}
             />
         </Box>
