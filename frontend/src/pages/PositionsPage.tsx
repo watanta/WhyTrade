@@ -69,6 +69,7 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                                         <TableCell>売買</TableCell>
                                         <TableCell align="right">数量</TableCell>
                                         <TableCell align="right">単価</TableCell>
+                                        <TableCell>理由</TableCell>
                                         <TableCell align="center">アクション</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -79,6 +80,11 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                                             <TableCell>{trade.trade_type === 'BUY' ? '買い' : '売り'}</TableCell>
                                             <TableCell align="right">{Math.round(trade.quantity).toLocaleString()}</TableCell>
                                             <TableCell align="right">{Math.round(trade.price).toLocaleString()}</TableCell>
+                                            <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                <Tooltip title={trade.rationale || ''}>
+                                                    <span>{trade.rationale || '-'}</span>
+                                                </Tooltip>
+                                            </TableCell>
                                             <TableCell align="center">
                                                 <Tooltip title="この取引を決済する">
                                                     <IconButton
