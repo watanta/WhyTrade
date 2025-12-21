@@ -21,6 +21,14 @@ export interface Trade {
     updated_at: string;
 }
 
+export interface Position {
+    ticker_symbol: string;
+    total_quantity: number;
+    average_price: number;
+    total_amount: number;
+    trades: Trade[];
+}
+
 export interface TradeCreate {
     ticker_symbol: string;
     trade_type: 'BUY' | 'SELL';
@@ -66,6 +74,10 @@ const tradeService = {
     },
     deleteTrade: async (id: string) => {
         const response = await apiClient.delete<Trade>(`/trades/${id}`);
+        return response.data;
+    },
+    getPositions: async () => {
+        const response = await apiClient.get<Position[]>('/trades/positions');
         return response.data;
     },
     closeTrade: async (id: string, closeData: TradeClose) => {

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
@@ -61,6 +61,16 @@ class TradeResponse(TradeBase):
     profit_loss: Optional[Decimal] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class PositionResponse(BaseModel):
+    ticker_symbol: str
+    total_quantity: Decimal
+    average_price: Decimal
+    total_amount: Decimal
+    trades: List[TradeResponse]
 
     class Config:
         from_attributes = True

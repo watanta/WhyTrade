@@ -1,14 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import tradeService, { Trade, TradeCreate, TradeUpdate } from '../../services/tradeService';
+import tradeService, { Trade, TradeCreate, TradeUpdate, Position } from '../../services/tradeService';
 
 interface TradeState {
     trades: Trade[];
+    positions: Position[];
     isLoading: boolean;
     error: string | null;
 }
 
 const initialState: TradeState = {
     trades: [],
+    positions: [],
     isLoading: false,
     error: null,
 };
@@ -20,6 +22,17 @@ export const fetchTrades = createAsyncThunk(
             return await tradeService.getTrades();
         } catch (err: any) {
             return rejectWithValue(err.response?.data?.detail || 'Failed to fetch trades');
+        }
+    }
+);
+
+export const fetchPositions = createAsyncThunk(
+    'trades/fetchPositions',
+    async (_: void, { rejectWithValue }: { rejectWithValue: any }) => {
+        try {
+            return await tradeService.getPositions();
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.detail || 'Failed to fetch positions');
         }
     }
 );
@@ -84,6 +97,9 @@ const tradeSlice = createSlice({
             .addCase(fetchTrades.fulfilled, (state, action: PayloadAction<Trade[]>) => {
                 state.isLoading = false;
                 state.trades = action.payload;
+            })
+            .addCase(fetchPositions.fulfilled, (state, action: PayloadAction<Position[]>) => {
+                state.positions = action.payload;
             })
             .addCase(fetchTrades.rejected, (state, action) => {
                 state.isLoading = false;

@@ -1,4 +1,5 @@
 from typing import Any, List
+from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -7,6 +8,50 @@ from app import schemas, models
 from app.api import deps
 
 router = APIRouter()
+
+@router.get("/positions", response_model=List[schemas.trade.PositionResponse])
+def read_positions(
+    db: Session = Depends(deps.get_db),
+    current_user: models.user.User = Depends(deps.get_current_user),
+) -> Any:
+    """ユーザーの保有ポジションを銘柄ごとに集計して取得"""
+    open_trades = (
+        db.query(models.trade.Trade)
+        .filter(
+            models.trade.Trade.user_id == current_user.id,
+            models.trade.Trade.status == models.trade.TradeStatus.OPEN
+        )
+        .order_by(models.trade.Trade.executed_at.desc(), models.trade.Trade.id.desc())
+        .all()
+    )
+    
+    positions_map = {}
+    for trade in open_trades:
+        symbol = trade.ticker_symbol
+        if symbol not in positions_map:
+            positions_map[symbol] = {
+                "ticker_symbol": symbol,
+                "total_quantity": Decimal(0),
+                "total_amount": Decimal(0),
+                "trades": []
+            }
+        
+        positions_map[symbol]["total_quantity"] += trade.quantity
+        positions_map[symbol]["total_amount"] += trade.total_amount
+        positions_map[symbol]["trades"].append(trade)
+    
+    result = []
+    for symbol, data in positions_map.items():
+        avg_price = data["total_amount"] / data["total_quantity"] if data["total_quantity"] > 0 else 0
+        result.append({
+            "ticker_symbol": symbol,
+            "total_quantity": data["total_quantity"],
+            "average_price": avg_price,
+            "total_amount": data["total_amount"],
+            "trades": data["trades"]
+        })
+    
+    return result
 
 @router.get("/", response_model=List[schemas.trade.TradeResponse])
 def read_trades(
@@ -19,6 +64,7 @@ def read_trades(
     trades = (
         db.query(models.trade.Trade)
         .filter(models.trade.Trade.user_id == current_user.id)
+        .order_by(models.trade.Trade.executed_at.desc(), models.trade.Trade.id.desc())
         .offset(skip)
         .limit(limit)
         .all()
@@ -110,7 +156,10 @@ def settle_trade(
     trade_close: schemas.trade.TradeClose,
     current_user: models.user.User = Depends(deps.get_current_user),
 ) -> Any:
-    """保有中の取引を決済（クローズ）"""
+    """保有中の取引を決済し、履歴に新しい行（売決済/買決済）を追加"""
+    from datetime import datetime
+    
+    # 1. 元の取引を取得
     trade = db.query(models.trade.Trade).filter(
         models.trade.Trade.id == id,
         models.trade.Trade.user_id == current_user.id
@@ -122,22 +171,34 @@ def settle_trade(
     if trade.status == models.trade.TradeStatus.CLOSED:
         raise HTTPException(status_code=400, detail="Trade is already closed")
     
-    # Calculate profit/loss
-    # BUY: (ClosePrice - OpenPrice) * Quantity
-    # SELL: (OpenPrice - ClosePrice) * Quantity
+    # 元の取引をクローズ済みに更新
+    trade.status = models.trade.TradeStatus.CLOSED
+    
+    # 2. 決済用の新しい取引記録を作成
+    # 買いなら売り決済、売りなら買い決済
+    exit_type = models.trade.TradeType.SELL if trade.trade_type == models.trade.TradeType.BUY else models.trade.TradeType.BUY
+    
+    # 損益計算
     if trade.trade_type == models.trade.TradeType.BUY:
         profit_loss = (trade_close.closing_price - trade.price) * trade.quantity
     else:
         profit_loss = (trade.price - trade_close.closing_price) * trade.quantity
         
-    trade.status = models.trade.TradeStatus.CLOSED
-    trade.profit_loss = profit_loss
-    if trade_close.closed_at:
-        trade.executed_at = trade_close.closed_at # Optionally update executed_at to settlement time? 
-        # Actually design says 'executed_at' is open time, but maybe we should add closed_at to model if needed.
-        # For now, let's just stick to profit_loss and status.
+    exit_trade = models.trade.Trade(
+        user_id=current_user.id,
+        ticker_symbol=trade.ticker_symbol,
+        trade_type=exit_type,
+        quantity=trade.quantity,
+        price=trade_close.closing_price,
+        total_amount=trade.quantity * trade_close.closing_price,
+        executed_at=trade_close.closed_at or datetime.now(),
+        status=models.trade.TradeStatus.CLOSED,
+        profit_loss=profit_loss,
+        rationale=f"決済による反対売買 (元ID: {str(trade.id)[:8]}...)"
+    )
     
     db.add(trade)
+    db.add(exit_trade)
     db.commit()
-    db.refresh(trade)
-    return trade
+    db.refresh(exit_trade)
+    return exit_trade

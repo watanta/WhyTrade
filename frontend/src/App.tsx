@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import TradesPage from './pages/TradesPage';
+import PositionsPage from './pages/PositionsPage';
 
 function App() {
     const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -36,8 +37,11 @@ function App() {
                     </Typography>
                     {isAuthenticated ? (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Button color="inherit" component={Link} to="/positions" sx={{ mr: 2 }}>
+                                保有ポジション
+                            </Button>
                             <Button color="inherit" component={Link} to="/trades" sx={{ mr: 2 }}>
-                                取引一覧
+                                取引履歴
                             </Button>
                             <Typography variant="body1" sx={{ mr: 2 }}>
                                 {user?.full_name}
@@ -73,6 +77,7 @@ function App() {
                                 </Box>
                             }
                         />
+                        <Route path="/positions" element={<PositionsPage />} />
                         <Route path="/trades" element={<TradesPage />} />
                     </Route>
                 </Routes>
