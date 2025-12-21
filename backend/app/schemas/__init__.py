@@ -1,1 +1,1 @@
-from .user import User, UserCreate, UserUpdate, UserResponse, Token, TokenPayload
+from .user import UserCreate, UserUpdate, UserResponse, Token, TokenPayload
