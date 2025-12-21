@@ -12,10 +12,10 @@ RUN apt-get update && apt-get install -y \
 RUN pip install poetry
 
 # 依存関係のインストール
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
 RUN poetry config virtualenvs.create false \
-    && poetry lock --no-update \
-    && poetry install --no-interaction --no-ansi
+    && poetry lock \
+    && poetry install --no-interaction --no-ansi --no-root
 
 # アプリケーションコードのコピー
 COPY . .
