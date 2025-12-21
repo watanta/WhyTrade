@@ -14,6 +14,7 @@ import { logout } from './features/auth/authSlice';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import TradesPage from './pages/TradesPage';
 
 function App() {
     const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -35,6 +36,9 @@ function App() {
                     </Typography>
                     {isAuthenticated ? (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Button color="inherit" component={Link} to="/trades" sx={{ mr: 2 }}>
+                                取引一覧
+                            </Button>
                             <Typography variant="body1" sx={{ mr: 2 }}>
                                 {user?.full_name}
                             </Typography>
@@ -69,6 +73,7 @@ function App() {
                                 </Box>
                             }
                         />
+                        <Route path="/trades" element={<TradesPage />} />
                     </Route>
                 </Routes>
             </Container>
