@@ -151,8 +151,8 @@ const TradesPage: React.FC = () => {
                                             variant="outlined"
                                         />
                                     </TableCell>
-                                    <TableCell align="right">{trade.quantity.toLocaleString()}</TableCell>
-                                    <TableCell align="right">{trade.price.toLocaleString()}</TableCell>
+                                    <TableCell align="right">{Math.round(trade.quantity).toLocaleString()}</TableCell>
+                                    <TableCell align="right">{Math.round(trade.price).toLocaleString()}</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                         {trade.profit_loss != null ? (
                                             <Typography
@@ -160,7 +160,7 @@ const TradesPage: React.FC = () => {
                                                 color={trade.profit_loss >= 0 ? 'success.main' : 'error.main'}
                                             >
                                                 {trade.profit_loss >= 0 ? '+' : ''}
-                                                {trade.profit_loss.toLocaleString()}
+                                                {Math.round(trade.profit_loss).toLocaleString()}
                                             </Typography>
                                         ) : (
                                             '-'
