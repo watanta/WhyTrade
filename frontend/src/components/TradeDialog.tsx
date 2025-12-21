@@ -46,10 +46,33 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
 
     const quantity = watch('quantity');
     const price = watch('price');
+    const targetPrice = watch('target_price');
+    const stopLoss = watch('stop_loss');
 
     useEffect(() => {
         setValue('total_amount', (quantity || 0) * (price || 0));
     }, [quantity, price, setValue]);
+
+    // Auto-calculate risk-reward ratio
+    useEffect(() => {
+        const entryPrice = Number(price) || 0;
+        const target = Number(targetPrice) || 0;
+        const stop = Number(stopLoss) || 0;
+
+        if (entryPrice > 0 && target > 0 && stop > 0) {
+            const potentialProfit = Math.abs(target - entryPrice);
+            const potentialLoss = Math.abs(entryPrice - stop);
+
+            if (potentialLoss > 0) {
+                const ratio = potentialProfit / potentialLoss;
+                setValue('risk_reward_ratio', Number(ratio.toFixed(2)));
+            } else {
+                setValue('risk_reward_ratio', 0);
+            }
+        } else {
+            setValue('risk_reward_ratio', 0);
+        }
+    }, [price, targetPrice, stopLoss, setValue]);
 
     useEffect(() => {
         if (initialData) {
@@ -289,23 +312,9 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             />
                         </Grid>
 
-                        <Grid item xs={6}>
-                            <Controller
-                                name="risk_reward_ratio"
-                                control={control}
-                                render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="リスクリワード比"
-                                        type="number"
-                                        fullWidth
-                                        inputProps={{ step: 0.1 }}
-                                    />
-                                )}
-                            />
-                        </Grid>
 
-                        <Grid item xs={6}>
+
+                        <Grid item xs={12}>
                             <Controller
                                 name="confidence_level"
                                 control={control}
@@ -446,6 +455,22 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             />
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <Controller
+                                name="risk_reward_ratio"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="リスクリワード比（自動計算）"
+                                        fullWidth
+                                        disabled
+                                        value={field.value > 0 ? `1:${field.value.toFixed(1)}` : '-'}
+                                        helperText="エントリー価格、目標価格、損切りラインから自動計算"
+                                    />
+                                )}
+                            />
+                        </Grid>
 
                         <Grid item xs={12}>
                             <Controller
