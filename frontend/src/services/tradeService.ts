@@ -36,6 +36,11 @@ export interface TradeUpdate {
     profit_loss?: number;
 }
 
+export interface TradeClose {
+    closing_price: number;
+    closed_at?: string;
+}
+
 const tradeService = {
     getTrades: async () => {
         const response = await apiClient.get<Trade[]>('/trades/');
@@ -55,6 +60,10 @@ const tradeService = {
     },
     deleteTrade: async (id: string) => {
         const response = await apiClient.delete<Trade>(`/trades/${id}`);
+        return response.data;
+    },
+    closeTrade: async (id: string, closeData: TradeClose) => {
+        const response = await apiClient.post<Trade>(`/trades/${id}/close`, closeData);
         return response.data;
     },
 };

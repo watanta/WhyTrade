@@ -48,3 +48,7 @@ class TradeResponse(TradeBase):
 
     class Config:
         from_attributes = True
+
+class TradeClose(BaseModel):
+    closing_price: Decimal
+    closed_at: Optional[datetime] = None

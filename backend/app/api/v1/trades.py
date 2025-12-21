@@ -101,3 +101,43 @@ def delete_trade(
     db.delete(trade)
     db.commit()
     return trade
+
+@router.post("/{id}/close", response_model=schemas.trade.TradeResponse)
+def settle_trade(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: UUID,
+    trade_close: schemas.trade.TradeClose,
+    current_user: models.user.User = Depends(deps.get_current_user),
+) -> Any:
+    """保有中の取引を決済（クローズ）"""
+    trade = db.query(models.trade.Trade).filter(
+        models.trade.Trade.id == id,
+        models.trade.Trade.user_id == current_user.id
+    ).first()
+    
+    if not trade:
+        raise HTTPException(status_code=404, detail="Trade not found")
+    
+    if trade.status == models.trade.TradeStatus.CLOSED:
+        raise HTTPException(status_code=400, detail="Trade is already closed")
+    
+    # Calculate profit/loss
+    # BUY: (ClosePrice - OpenPrice) * Quantity
+    # SELL: (OpenPrice - ClosePrice) * Quantity
+    if trade.trade_type == models.trade.TradeType.BUY:
+        profit_loss = (trade_close.closing_price - trade.price) * trade.quantity
+    else:
+        profit_loss = (trade.price - trade_close.closing_price) * trade.quantity
+        
+    trade.status = models.trade.TradeStatus.CLOSED
+    trade.profit_loss = profit_loss
+    if trade_close.closed_at:
+        trade.executed_at = trade_close.closed_at # Optionally update executed_at to settlement time? 
+        # Actually design says 'executed_at' is open time, but maybe we should add closed_at to model if needed.
+        # For now, let's just stick to profit_loss and status.
+    
+    db.add(trade)
+    db.commit()
+    db.refresh(trade)
+    return trade

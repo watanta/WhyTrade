@@ -15,7 +15,7 @@ const initialState: TradeState = {
 
 export const fetchTrades = createAsyncThunk(
     'trades/fetchTrades',
-    async (_, { rejectWithValue }) => {
+    async (_: void, { rejectWithValue }: { rejectWithValue: any }) => {
         try {
             return await tradeService.getTrades();
         } catch (err: any) {
@@ -26,7 +26,7 @@ export const fetchTrades = createAsyncThunk(
 
 export const addTrade = createAsyncThunk(
     'trades/addTrade',
-    async (tradeData: TradeCreate, { rejectWithValue }) => {
+    async (tradeData: TradeCreate, { rejectWithValue }: { rejectWithValue: any }) => {
         try {
             return await tradeService.createTrade(tradeData);
         } catch (err: any) {
@@ -37,7 +37,7 @@ export const addTrade = createAsyncThunk(
 
 export const editTrade = createAsyncThunk(
     'trades/editTrade',
-    async ({ id, data }: { id: string; data: TradeUpdate }, { rejectWithValue }) => {
+    async ({ id, data }: { id: string; data: TradeUpdate }, { rejectWithValue }: { rejectWithValue: any }) => {
         try {
             return await tradeService.updateTrade(id, data);
         } catch (err: any) {
@@ -48,12 +48,25 @@ export const editTrade = createAsyncThunk(
 
 export const removeTrade = createAsyncThunk(
     'trades/removeTrade',
-    async (id: string, { rejectWithValue }) => {
+    async (id: string, { rejectWithValue }: { rejectWithValue: any }) => {
         try {
             await tradeService.deleteTrade(id);
             return id;
         } catch (err: any) {
             return rejectWithValue(err.response?.data?.detail || 'Failed to delete trade');
+        }
+    }
+);
+
+import { TradeClose } from '../../services/tradeService';
+
+export const settleTrade = createAsyncThunk(
+    'trades/settleTrade',
+    async ({ id, data }: { id: string; data: TradeClose }, { rejectWithValue }: { rejectWithValue: any }) => {
+        try {
+            return await tradeService.closeTrade(id, data);
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.detail || 'Failed to settle trade');
         }
     }
 );
@@ -87,6 +100,12 @@ const tradeSlice = createSlice({
             })
             .addCase(removeTrade.fulfilled, (state, action: PayloadAction<string>) => {
                 state.trades = state.trades.filter((t) => t.id !== action.payload);
+            })
+            .addCase(settleTrade.fulfilled, (state, action: PayloadAction<Trade>) => {
+                const index = state.trades.findIndex((t) => t.id === action.payload.id);
+                if (index !== -1) {
+                    state.trades[index] = action.payload;
+                }
             });
     },
 });

@@ -15,17 +15,25 @@ import {
     Chip,
     CircularProgress,
     Alert,
+    Tooltip,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { fetchTrades, addTrade, editTrade, removeTrade } from '../features/trades/tradeSlice';
+import {
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    Add as AddIcon,
+    CheckCircle as CheckCircleIcon,
+} from '@mui/icons-material';
+import { fetchTrades, addTrade, editTrade, removeTrade, settleTrade } from '../features/trades/tradeSlice';
 import { RootState, AppDispatch } from '../features/store';
 import TradeDialog from '../components/TradeDialog';
-import { Trade } from '../services/tradeService';
+import SettleTradeDialog from '../components/SettleTradeDialog';
+import { Trade, TradeCreate, TradeUpdate, TradeClose } from '../services/tradeService';
 
 const TradesPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { trades, isLoading, error } = useSelector((state: RootState) => state.trades);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [settleDialogOpen, setSettleDialogOpen] = useState(false);
     const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
 
     useEffect(() => {
@@ -42,6 +50,11 @@ const TradesPage: React.FC = () => {
         setDialogOpen(true);
     };
 
+    const handleSettleClick = (trade: Trade) => {
+        setSelectedTrade(trade);
+        setSettleDialogOpen(true);
+    };
+
     const handleDeleteClick = (id: string) => {
         if (window.confirm('この取引を削除してもよろしいですか？')) {
             dispatch(removeTrade(id));
@@ -53,13 +66,25 @@ const TradesPage: React.FC = () => {
         setSelectedTrade(null);
     };
 
-    const handleDialogSubmit = (data: any) => {
+    const handleSettleDialogClose = () => {
+        setSettleDialogOpen(false);
+        setSelectedTrade(null);
+    };
+
+    const handleDialogSubmit = (data: TradeCreate | TradeUpdate) => {
         if (selectedTrade) {
-            dispatch(editTrade({ id: selectedTrade.id, data }));
+            dispatch(editTrade({ id: selectedTrade.id, data: data as TradeUpdate }));
         } else {
-            dispatch(addTrade(data));
+            dispatch(addTrade(data as TradeCreate));
         }
         handleDialogClose();
+    };
+
+    const handleSettleSubmit = (data: TradeClose) => {
+        if (selectedTrade) {
+            dispatch(settleTrade({ id: selectedTrade.id, data }));
+        }
+        handleSettleDialogClose();
     };
 
     if (isLoading && trades.length === 0) {
@@ -96,13 +121,13 @@ const TradesPage: React.FC = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>銘柄コード</TableCell>
+                            <TableCell>銘柄</TableCell>
                             <TableCell>売買</TableCell>
                             <TableCell align="right">数量</TableCell>
                             <TableCell align="right">単価</TableCell>
-                            <TableCell align="right">合計金額</TableCell>
+                            <TableCell align="right">損益</TableCell>
                             <TableCell>約定日時</TableCell>
-                            <TableCell>ステータス</TableCell>
+                            <TableCell>状態</TableCell>
                             <TableCell align="center">アクション</TableCell>
                         </TableRow>
                     </TableHead>
@@ -116,26 +141,46 @@ const TradesPage: React.FC = () => {
                         ) : (
                             trades.map((trade) => (
                                 <TableRow key={trade.id}>
-                                    <TableCell>{trade.ticker_symbol}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>{trade.ticker_symbol}</TableCell>
                                     <TableCell>
                                         <Chip
                                             label={trade.trade_type === 'BUY' ? '買い' : '売り'}
                                             color={trade.trade_type === 'BUY' ? 'primary' : 'secondary'}
                                             size="small"
+                                            variant="outlined"
                                         />
                                     </TableCell>
                                     <TableCell align="right">{trade.quantity.toLocaleString()}</TableCell>
                                     <TableCell align="right">{trade.price.toLocaleString()}</TableCell>
-                                    <TableCell align="right">{trade.total_amount.toLocaleString()}</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                                        {trade.profit_loss !== null ? (
+                                            <Typography
+                                                component="span"
+                                                color={trade.profit_loss >= 0 ? 'success.main' : 'error.main'}
+                                            >
+                                                {trade.profit_loss >= 0 ? '+' : ''}
+                                                {trade.profit_loss.toLocaleString()}
+                                            </Typography>
+                                        ) : (
+                                            '-'
+                                        )}
+                                    </TableCell>
                                     <TableCell>{new Date(trade.executed_at).toLocaleString()}</TableCell>
                                     <TableCell>
                                         <Chip
                                             label={trade.status === 'OPEN' ? '保有中' : '決済済'}
-                                            variant="outlined"
+                                            color={trade.status === 'OPEN' ? 'warning' : 'default'}
                                             size="small"
                                         />
                                     </TableCell>
                                     <TableCell align="center">
+                                        {trade.status === 'OPEN' && (
+                                            <Tooltip title="決済する">
+                                                <IconButton size="small" color="primary" onClick={() => handleSettleClick(trade)}>
+                                                    <CheckCircleIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
                                         <IconButton size="small" onClick={() => handleEditClick(trade)}>
                                             <EditIcon />
                                         </IconButton>
@@ -155,6 +200,13 @@ const TradesPage: React.FC = () => {
                 onClose={handleDialogClose}
                 onSubmit={handleDialogSubmit}
                 initialData={selectedTrade}
+            />
+
+            <SettleTradeDialog
+                open={settleDialogOpen}
+                onClose={handleSettleDialogClose}
+                onSubmit={handleSettleSubmit}
+                trade={selectedTrade}
             />
         </Box>
     );
