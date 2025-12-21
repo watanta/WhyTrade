@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Typography,
     Box,
-    Button,
     Paper,
     Table,
     TableBody,
@@ -15,12 +14,10 @@ import {
     Chip,
     CircularProgress,
     Alert,
-    Tooltip,
 } from '@mui/material';
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Add as AddIcon,
 } from '@mui/icons-material';
 import { fetchTrades, addTrade, editTrade, removeTrade } from '../features/trades/tradeSlice';
 import { RootState, AppDispatch } from '../features/store';
@@ -37,10 +34,6 @@ const TradesPage: React.FC = () => {
         dispatch(fetchTrades());
     }, [dispatch]);
 
-    const handleAddClick = () => {
-        setSelectedTrade(null);
-        setDialogOpen(true);
-    };
 
     const handleEditClick = (trade: Trade) => {
         setSelectedTrade(trade);
@@ -52,6 +45,7 @@ const TradesPage: React.FC = () => {
             dispatch(removeTrade(id));
         }
     };
+
 
     const handleDialogClose = () => {
         setDialogOpen(false);
@@ -81,14 +75,6 @@ const TradesPage: React.FC = () => {
                 <Typography variant="h4" component="h1">
                     取引一覧
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddIcon />}
-                    onClick={handleAddClick}
-                >
-                    新規取引登録
-                </Button>
             </Box>
 
             {error && (

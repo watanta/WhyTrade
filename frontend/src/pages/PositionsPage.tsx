@@ -21,10 +21,13 @@ import {
     KeyboardArrowUp as KeyboardArrowUpIcon,
     CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import { fetchPositions, settleTrade } from '../features/trades/tradeSlice';
+import { fetchPositions, settleTrade, addTrade } from '../features/trades/tradeSlice';
 import { RootState, AppDispatch } from '../features/store';
 import SettleTradeDialog from '../components/SettleTradeDialog';
-import { Trade, Position, TradeClose } from '../services/tradeService';
+import TradeDialog from '../components/TradeDialog';
+import { Trade, Position, TradeClose, TradeCreate, TradeUpdate } from '../services/tradeService';
+import { Add as AddIcon } from '@mui/icons-material';
+import { Button } from '@mui/material';
 
 const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void }) => {
     const { position, onSettle } = props;
@@ -103,6 +106,7 @@ const PositionsPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { positions, isLoading, error } = useSelector((state: RootState) => state.trades);
     const [settleDialogOpen, setSettleDialogOpen] = useState(false);
+    const [addDialogOpen, setAddDialogOpen] = useState(false);
     const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
 
     useEffect(() => {
@@ -128,6 +132,21 @@ const PositionsPage: React.FC = () => {
         handleSettleDialogClose();
     };
 
+    const handleAddClick = () => {
+        setAddDialogOpen(true);
+    };
+
+    const handleAddDialogClose = () => {
+        setAddDialogOpen(false);
+    };
+
+    const handleAddDialogSubmit = async (data: TradeCreate | TradeUpdate) => {
+        await dispatch(addTrade(data as TradeCreate));
+        // Refresh positions after adding new trade
+        dispatch(fetchPositions());
+        handleAddDialogClose();
+    };
+
     if (isLoading && positions.length === 0) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -138,9 +157,19 @@ const PositionsPage: React.FC = () => {
 
     return (
         <Box>
-            <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-                保有ポジション
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h4" component="h1">
+                    保有ポジション
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddClick}
+                >
+                    新規ポジション登録
+                </Button>
+            </Box>
 
             {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>
@@ -185,6 +214,13 @@ const PositionsPage: React.FC = () => {
                 onClose={handleSettleDialogClose}
                 onSubmit={handleSettleSubmit}
                 trade={selectedTrade}
+            />
+
+            <TradeDialog
+                open={addDialogOpen}
+                onClose={handleAddDialogClose}
+                onSubmit={handleAddDialogSubmit}
+                initialData={null}
             />
         </Box>
     );
