@@ -272,7 +272,7 @@ const PositionsPage: React.FC = () => {
             <ReflectionDialog
                 open={reflectionDialogOpen}
                 onClose={handleReflectionDialogClose}
-                tradeId={selectedTrade ? selectedTrade.id : null}
+                trade={selectedTrade}
             />
         </Box>
     );
