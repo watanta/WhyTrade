@@ -11,27 +11,36 @@ import {
     TableHead,
     TableRow,
     IconButton,
+    Collapse,
+    Chip,
     CircularProgress,
     Alert,
     Tooltip,
-    Collapse,
+    Tabs,
+    Tab,
 } from '@mui/material';
 import {
     KeyboardArrowDown as KeyboardArrowDownIcon,
     KeyboardArrowUp as KeyboardArrowUpIcon,
     CheckCircle as CheckCircleIcon,
+    RateReview as RateReviewIcon,
 } from '@mui/icons-material';
 import { fetchPositions, settleTrade, addTrade } from '../features/trades/tradeSlice';
 import { RootState, AppDispatch } from '../features/store';
 import SettleTradeDialog from '../components/SettleTradeDialog';
 import TradeDialog from '../components/TradeDialog';
+import ReflectionDialog from '../components/ReflectionDialog';
 import { Trade, Position, TradeClose, TradeCreate, TradeUpdate } from '../services/tradeService';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Button } from '@mui/material';
 
-const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void }) => {
-    const { position, onSettle } = props;
+const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void, onReflect: (trade: Trade) => void }) => {
+    const { position, onSettle, onReflect } = props;
     const [open, setOpen] = useState(false);
+
+    // Find the entry trade (trade without related_trade_id)
+    const entryTrade = position.trades.find(t => !t.related_trade_id);
+    const isClosedPosition = entryTrade?.status === 'CLOSED';
 
     return (
         <React.Fragment>
@@ -52,7 +61,17 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                 <TableCell align="right">{Math.round(position.average_price).toLocaleString()}</TableCell>
                 <TableCell align="right">{Math.round(position.total_amount).toLocaleString()}</TableCell>
                 <TableCell align="right">
-                    {/* Position level action could be here, but for now we settle individual trades */}
+                    {isClosedPosition && entryTrade ? (
+                        <Tooltip title="振り返りを入力">
+                            <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => onReflect(entryTrade)}
+                            >
+                                <RateReviewIcon />
+                            </IconButton>
+                        </Tooltip>
+                    ) : null}
                 </TableCell>
             </TableRow>
             <TableRow>
@@ -86,15 +105,17 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                                                 </Tooltip>
                                             </TableCell>
                                             <TableCell align="center">
-                                                <Tooltip title="この取引を決済する">
-                                                    <IconButton
-                                                        size="small"
-                                                        color="primary"
-                                                        onClick={() => onSettle(trade)}
-                                                    >
-                                                        <CheckCircleIcon />
-                                                    </IconButton>
-                                                </Tooltip>
+                                                {trade.status === 'OPEN' && (
+                                                    <Tooltip title="この取引を決済する">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="primary"
+                                                            onClick={() => onSettle(trade)}
+                                                        >
+                                                            <CheckCircleIcon />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -113,11 +134,14 @@ const PositionsPage: React.FC = () => {
     const { positions, isLoading, error } = useSelector((state: RootState) => state.trades);
     const [settleDialogOpen, setSettleDialogOpen] = useState(false);
     const [addDialogOpen, setAddDialogOpen] = useState(false);
+    const [reflectionDialogOpen, setReflectionDialogOpen] = useState(false);
     const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+    const [tabValue, setTabValue] = useState(0);
 
     useEffect(() => {
-        dispatch(fetchPositions());
-    }, [dispatch]);
+        const includeClosed = tabValue === 1;
+        dispatch(fetchPositions(includeClosed));
+    }, [dispatch, tabValue]);
 
     const handleSettleClick = (trade: Trade) => {
         setSelectedTrade(trade);
@@ -153,6 +177,16 @@ const PositionsPage: React.FC = () => {
         handleAddDialogClose();
     };
 
+    const handleReflectClick = (trade: Trade) => {
+        setSelectedTrade(trade);
+        setReflectionDialogOpen(true);
+    };
+
+    const handleReflectionDialogClose = () => {
+        setReflectionDialogOpen(false);
+        setSelectedTrade(null);
+    };
+
     if (isLoading && positions.length === 0) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -165,7 +199,7 @@ const PositionsPage: React.FC = () => {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h4" component="h1">
-                    保有ポジション
+                    ポジション
                 </Typography>
                 <Button
                     variant="contained"
@@ -173,9 +207,14 @@ const PositionsPage: React.FC = () => {
                     startIcon={<AddIcon />}
                     onClick={handleAddClick}
                 >
-                    新規ポジション登録
+                    新規ポジション
                 </Button>
             </Box>
+
+            <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} sx={{ mb: 2 }}>
+                <Tab label="保有中" />
+                <Tab label="決済済み" />
+            </Tabs>
 
             {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>
@@ -208,6 +247,7 @@ const PositionsPage: React.FC = () => {
                                     key={position.ticker_symbol}
                                     position={position}
                                     onSettle={handleSettleClick}
+                                    onReflect={handleReflectClick}
                                 />
                             ))
                         )}
@@ -227,6 +267,12 @@ const PositionsPage: React.FC = () => {
                 onClose={handleAddDialogClose}
                 onSubmit={handleAddDialogSubmit}
                 initialData={null}
+            />
+
+            <ReflectionDialog
+                open={reflectionDialogOpen}
+                onClose={handleReflectionDialogClose}
+                tradeId={selectedTrade ? selectedTrade.id : null}
             />
         </Box>
     );

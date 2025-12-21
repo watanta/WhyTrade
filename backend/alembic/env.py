@@ -11,7 +11,8 @@ import os
 sys.path.append(os.getcwd())
 
 from app.core.database import Base
-from app.models import trade  # Import models to register them
+from app.core.database import Base
+from app.models import trade, reflection, user  # Import models to register them
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

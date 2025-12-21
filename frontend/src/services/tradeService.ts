@@ -57,6 +57,34 @@ export interface TradeClose {
     rationale?: string;
 }
 
+export interface Reflection {
+    id: string;
+    trade_id: string;
+    what_went_well?: string;
+    what_went_wrong?: string;
+    lessons_learned?: string;
+    action_items?: string;
+    satisfaction_rating?: number;
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface ReflectionCreate {
+    what_went_well?: string;
+    what_went_wrong?: string;
+    lessons_learned?: string;
+    action_items?: string;
+    satisfaction_rating?: number;
+}
+
+export interface ReflectionUpdate {
+    what_went_well?: string;
+    what_went_wrong?: string;
+    lessons_learned?: string;
+    action_items?: string;
+    satisfaction_rating?: number;
+}
+
 const tradeService = {
     getTrades: async () => {
         const response = await apiClient.get<Trade[]>('/trades/');
@@ -78,12 +106,29 @@ const tradeService = {
         const response = await apiClient.delete<Trade>(`/trades/${id}`);
         return response.data;
     },
-    getPositions: async () => {
-        const response = await apiClient.get<Position[]>('/trades/positions');
+    getPositions: async (includeClosed: boolean = false): Promise<Position[]> => {
+        const response = await apiClient.get<Position[]>('/trades/positions', {
+            params: { include_closed: includeClosed }
+        });
         return response.data;
     },
     closeTrade: async (id: string, closeData: TradeClose) => {
         const response = await apiClient.post<Trade>(`/trades/${id}/close`, closeData);
+        return response.data;
+    },
+
+    getReflection: async (tradeId: string): Promise<Reflection> => {
+        const response = await apiClient.get(`/reflections/${tradeId}/reflection`);
+        return response.data;
+    },
+
+    createReflection: async (tradeId: string, data: ReflectionCreate): Promise<Reflection> => {
+        const response = await apiClient.post(`/reflections/${tradeId}/reflection`, data);
+        return response.data;
+    },
+
+    updateReflection: async (tradeId: string, data: ReflectionUpdate): Promise<Reflection> => {
+        const response = await apiClient.put(`/reflections/${tradeId}/reflection`, data);
         return response.data;
     },
 };

@@ -43,3 +43,5 @@ class Trade(Base):
     
     related_trade_id = Column(UUID(as_uuid=True), ForeignKey("trades.id"), nullable=True)
     related_trade = relationship("Trade", remote_side=[id])
+
+    reflection = relationship("TradeReflection", back_populates="trade", uselist=False, cascade="all, delete-orphan")

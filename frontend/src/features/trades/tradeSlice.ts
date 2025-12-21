@@ -28,12 +28,9 @@ export const fetchTrades = createAsyncThunk(
 
 export const fetchPositions = createAsyncThunk(
     'trades/fetchPositions',
-    async (_: void, { rejectWithValue }: { rejectWithValue: any }) => {
-        try {
-            return await tradeService.getPositions();
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.detail || 'Failed to fetch positions');
-        }
+    async (includeClosed: boolean = false) => {
+        const response = await tradeService.getPositions(includeClosed);
+        return response;
     }
 );
 

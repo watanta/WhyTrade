@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.models.user import User # Import models to register them with Base
+from app.models import User, Trade, TradeReflection  # Import models to register them with Base
 from sqlalchemy import text
 
 # データベーステーブルの作成
@@ -32,6 +32,7 @@ async def health_check():
     return {"status": "healthy"}
 
 # APIルーターをここに追加
-from app.api.v1 import auth, trades
+from app.api.v1 import auth, trades, reflections
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(trades.router, prefix=f"{settings.API_V1_STR}/trades", tags=["trades"])
+app.include_router(reflections.router, prefix=f"{settings.API_V1_STR}/reflections", tags=["reflections"])

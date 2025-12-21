@@ -13,20 +13,58 @@ router = APIRouter()
 def read_positions(
     db: Session = Depends(deps.get_db),
     current_user: models.user.User = Depends(deps.get_current_user),
+    include_closed: bool = False,
 ) -> Any:
     """ユーザーの保有ポジションを銘柄ごとに集計して取得"""
-    open_trades = (
-        db.query(models.trade.Trade)
-        .filter(
-            models.trade.Trade.user_id == current_user.id,
-            models.trade.Trade.status == models.trade.TradeStatus.OPEN
-        )
-        .order_by(models.trade.Trade.executed_at.desc(), models.trade.Trade.id.desc())
-        .all()
+    # Build query based on include_closed parameter
+    query = db.query(models.trade.Trade).filter(
+        models.trade.Trade.user_id == current_user.id
     )
     
+    # Filter by status and trade type
+    if include_closed:
+        # For closed positions, show only entry trades (trades without related_trade_id)
+        # This works for both long (BUY entry) and short (SELL entry) positions
+        query = query.filter(
+            models.trade.Trade.status == models.trade.TradeStatus.CLOSED,
+            models.trade.Trade.related_trade_id == None
+        )
+    else:
+        # For open positions, show only open trades
+        query = query.filter(models.trade.Trade.status == models.trade.TradeStatus.OPEN)
+    
+    trades = query.order_by(
+        models.trade.Trade.executed_at.desc(), 
+        models.trade.Trade.id.desc()
+    ).all()
+    
+    # For closed positions, return individual position pairs (entry + exit)
+    # For open positions, aggregate by ticker symbol
+    if include_closed:
+        result = []
+        for entry_trade in trades:
+            # Find the exit trade
+            exit_trade = db.query(models.trade.Trade).filter(
+                models.trade.Trade.related_trade_id == entry_trade.id
+            ).first()
+            
+            # Create a position for this entry-exit pair
+            position_trades = [entry_trade]
+            if exit_trade:
+                position_trades.append(exit_trade)
+            
+            result.append({
+                "ticker_symbol": entry_trade.ticker_symbol,
+                "total_quantity": entry_trade.quantity,
+                "average_price": entry_trade.price,
+                "total_amount": entry_trade.total_amount,
+                "trades": position_trades
+            })
+        return result
+    
+    # For open positions, aggregate by ticker symbol
     positions_map = {}
-    for trade in open_trades:
+    for trade in trades:
         symbol = trade.ticker_symbol
         if symbol not in positions_map:
             positions_map[symbol] = {
@@ -39,6 +77,15 @@ def read_positions(
         positions_map[symbol]["total_quantity"] += trade.quantity
         positions_map[symbol]["total_amount"] += trade.total_amount
         positions_map[symbol]["trades"].append(trade)
+        
+        # For closed positions, also include the exit trade
+        if include_closed and trade.related_trade_id is None:
+            # Find the exit trade that references this entry trade
+            exit_trade = db.query(models.trade.Trade).filter(
+                models.trade.Trade.related_trade_id == trade.id
+            ).first()
+            if exit_trade:
+                positions_map[symbol]["trades"].append(exit_trade)
     
     result = []
     for symbol, data in positions_map.items():
