@@ -1,35 +1,79 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Box, Container, AppBar, Toolbar, Typography } from '@mui/material'
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    AppBar,
+    Toolbar,
+    Typography,
+    Container,
+    CssBaseline,
+    Box,
+    Button,
+} from '@mui/material';
+import { RootState, AppDispatch } from './features/store';
+import { logout } from './features/auth/authSlice';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-    return (
-        <Router>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <AppBar position="static">
-                    <Toolbar>
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            WhyTrade
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
+    const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
-                <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
-                    <Routes>
-                        <Route path="/" element={
-                            <Box>
-                                <Typography variant="h4" gutterBottom>
-                                    株式売買意思決定PDCAアプリ
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    WhyTradeへようこそ。売買の意思決定を記録し、振り返りを通じて投資スキルを向上させましょう。
-                                </Typography>
-                            </Box>
-                        } />
-                    </Routes>
-                </Container>
-            </Box>
-        </Router>
-    )
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/login');
+    };
+
+    return (
+        <>
+            <CssBaseline />
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        WhyTrade
+                    </Typography>
+                    {isAuthenticated ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body1" sx={{ mr: 2 }}>
+                                {user?.full_name}
+                            </Typography>
+                            <Button color="inherit" onClick={handleLogout}>
+                                ログアウト
+                            </Button>
+                        </Box>
+                    ) : (
+                        <Box>
+                            <Button color="inherit" component={Link} to="/login">
+                                ログイン
+                            </Button>
+                        </Box>
+                    )}
+                </Toolbar>
+            </AppBar>
+            <Container sx={{ mt: 4 }}>
+                <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/"
+                            element={
+                                <Box sx={{ textAlign: 'center' }}>
+                                    <Typography variant="h4" component="h1" gutterBottom>
+                                        Welcome to WhyTrade
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        トレードの「なぜ」を記録し、振り返る。
+                                    </Typography>
+                                </Box>
+                            }
+                        />
+                    </Route>
+                </Routes>
+            </Container>
+        </>
+    );
 }
 
-export default App
+export default App;
