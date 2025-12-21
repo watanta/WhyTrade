@@ -26,6 +26,7 @@ const SettleTradeDialog: React.FC<SettleTradeDialogProps> = ({ open, onClose, on
         defaultValues: {
             closing_price: 0,
             closed_at: new Date().toISOString().slice(0, 16),
+            rationale: '',
         },
     });
 
@@ -50,14 +51,16 @@ const SettleTradeDialog: React.FC<SettleTradeDialogProps> = ({ open, onClose, on
             reset({
                 closing_price: trade?.price || 0,
                 closed_at: new Date().toISOString().slice(0, 16),
+                rationale: '',
             });
         }
     }, [open, trade, reset]);
 
-    const handleFormSubmit = (data: { closing_price: number; closed_at: string }) => {
+    const handleFormSubmit = (data: { closing_price: number; closed_at: string; rationale: string }) => {
         const formattedData: TradeClose = {
             closing_price: Number(data.closing_price),
             closed_at: new Date(data.closed_at).toISOString(),
+            rationale: data.rationale,
         };
         onSubmit(formattedData);
     };
@@ -111,6 +114,22 @@ const SettleTradeDialog: React.FC<SettleTradeDialogProps> = ({ open, onClose, on
                                         type="datetime-local"
                                         fullWidth
                                         InputLabelProps={{ shrink: true }}
+                                    />
+                                )}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Controller
+                                name="rationale"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="決済理由"
+                                        multiline
+                                        rows={3}
+                                        fullWidth
+                                        placeholder="例: 目標価格到達、損切りライン接触など"
                                     />
                                 )}
                             />

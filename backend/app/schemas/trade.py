@@ -78,3 +78,4 @@ class PositionResponse(BaseModel):
 class TradeClose(BaseModel):
     closing_price: Decimal
     closed_at: Optional[datetime] = None
+    rationale: Optional[str] = None

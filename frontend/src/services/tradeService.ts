@@ -53,6 +53,7 @@ export interface TradeUpdate {
 export interface TradeClose {
     closing_price: number;
     closed_at?: string;
+    rationale?: string;
 }
 
 const tradeService = {
