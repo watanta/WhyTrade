@@ -35,6 +35,7 @@ export interface Position {
     total_quantity: number;
     average_price: number;
     total_amount: number;
+    profit_loss?: number;
     trades: Trade[];
 }
 

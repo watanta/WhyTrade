@@ -34,8 +34,8 @@ import { Trade, Position, TradeClose, TradeCreate, TradeUpdate } from '../servic
 import { Add as AddIcon } from '@mui/icons-material';
 import { Button } from '@mui/material';
 
-const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void, onReflect: (trade: Trade) => void }) => {
-    const { position, onSettle, onReflect } = props;
+const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => void, onReflect: (trade: Trade) => void, showProfitLoss: boolean }) => {
+    const { position, onSettle, onReflect, showProfitLoss } = props;
     const [open, setOpen] = useState(false);
 
     // Find the entry trade (trade without related_trade_id)
@@ -60,6 +60,21 @@ const PositionRow = (props: { position: Position, onSettle: (trade: Trade) => vo
                 <TableCell align="right">{Math.round(position.total_quantity).toLocaleString()}</TableCell>
                 <TableCell align="right">{Math.round(position.average_price).toLocaleString()}</TableCell>
                 <TableCell align="right">{Math.round(position.total_amount).toLocaleString()}</TableCell>
+                {showProfitLoss && (
+                    <TableCell
+                        align="right"
+                        sx={{
+                            fontWeight: 'bold',
+                            color: position.profit_loss && position.profit_loss > 0 ? 'success.main' :
+                                position.profit_loss && position.profit_loss < 0 ? 'error.main' :
+                                    'text.primary'
+                        }}
+                    >
+                        {position.profit_loss !== null && position.profit_loss !== undefined
+                            ? `${position.profit_loss > 0 ? '+' : ''}${Math.round(position.profit_loss).toLocaleString()}`
+                            : '-'}
+                    </TableCell>
+                )}
                 <TableCell align="right">
                     {isClosedPosition && entryTrade ? (
                         <Tooltip title="振り返りを入力">
@@ -231,13 +246,14 @@ const PositionsPage: React.FC = () => {
                             <TableCell align="right">合計数量</TableCell>
                             <TableCell align="right">平均取得単価</TableCell>
                             <TableCell align="right">合計金額</TableCell>
+                            {tabValue === 1 && <TableCell align="right">損益</TableCell>}
                             <TableCell align="right" />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {positions.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} align="center">
+                                <TableCell colSpan={tabValue === 1 ? 7 : 6} align="center">
                                     現在保有しているポジションはありません。
                                 </TableCell>
                             </TableRow>
@@ -248,6 +264,7 @@ const PositionsPage: React.FC = () => {
                                     position={position}
                                     onSettle={handleSettleClick}
                                     onReflect={handleReflectClick}
+                                    showProfitLoss={tabValue === 1}
                                 />
                             ))
                         )}

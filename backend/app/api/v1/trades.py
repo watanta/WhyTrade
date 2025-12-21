@@ -50,14 +50,17 @@ def read_positions(
             
             # Create a position for this entry-exit pair
             position_trades = [entry_trade]
+            profit_loss = None
             if exit_trade:
                 position_trades.append(exit_trade)
+                profit_loss = exit_trade.profit_loss
             
             result.append({
                 "ticker_symbol": entry_trade.ticker_symbol,
                 "total_quantity": entry_trade.quantity,
                 "average_price": entry_trade.price,
                 "total_amount": entry_trade.total_amount,
+                "profit_loss": profit_loss,
                 "trades": position_trades
             })
         return result

@@ -89,6 +89,7 @@ class PositionResponse(BaseModel):
     total_quantity: Decimal
     average_price: Decimal
     total_amount: Decimal
+    profit_loss: Optional[Decimal] = None
     trades: List[TradeResponse]
 
     class Config:
