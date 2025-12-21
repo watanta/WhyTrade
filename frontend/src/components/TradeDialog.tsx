@@ -81,7 +81,11 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             <Controller
                                 name="ticker_symbol"
                                 control={control}
-                                rules={{ required: '銘柄コードは必須です' }}
+                                rules={{
+                                    required: '銘柄コードは必須です',
+                                    maxLength: { value: 10, message: '10文字以内で入力してください' },
+                                    pattern: { value: /^[A-Z0-9.\-]+$/i, message: '英数字、ピリオド、ハイフンのみ使用可能です' }
+                                }}
                                 render={({ field, fieldState: { error } }) => (
                                     <TextField
                                         {...field}
@@ -89,6 +93,9 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                         fullWidth
                                         error={!!error}
                                         helperText={error?.message}
+                                        placeholder="例: 7203, AAPL"
+                                        inputProps={{ style: { textTransform: 'uppercase' } }}
+                                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                                     />
                                 )}
                             />
@@ -109,12 +116,18 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             <Controller
                                 name="executed_at"
                                 control={control}
-                                render={({ field }) => (
+                                rules={{
+                                    required: '約定日時は必須です',
+                                    validate: (value) => new Date(value) <= new Date() || '未来の日時は選択できません'
+                                }}
+                                render={({ field, fieldState: { error } }) => (
                                     <TextField
                                         {...field}
                                         label="約定日時"
                                         type="datetime-local"
                                         fullWidth
+                                        error={!!error}
+                                        helperText={error?.message}
                                         InputLabelProps={{ shrink: true }}
                                     />
                                 )}
@@ -124,7 +137,10 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             <Controller
                                 name="quantity"
                                 control={control}
-                                rules={{ required: '数量は必須です', min: { value: 0.0001, message: '0より大きい値を入力してください' } }}
+                                rules={{
+                                    required: '数量は必須です',
+                                    min: { value: 0.000001, message: '0より大きい値を入力してください' }
+                                }}
                                 render={({ field, fieldState: { error } }) => (
                                     <TextField
                                         {...field}
@@ -141,7 +157,10 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             <Controller
                                 name="price"
                                 control={control}
-                                rules={{ required: '単価は必須です', min: { value: 0, message: '0以上の値を入力してください' } }}
+                                rules={{
+                                    required: '単価は必須です',
+                                    min: { value: 0, message: '0以上の値を入力してください' }
+                                }}
                                 render={({ field, fieldState: { error } }) => (
                                     <TextField
                                         {...field}

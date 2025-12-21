@@ -15,10 +15,10 @@ class TradeStatus(str, Enum):
 
 # Shared properties
 class TradeBase(BaseModel):
-    ticker_symbol: str
+    ticker_symbol: str = Field(..., min_length=1, max_length=10, pattern=r"^[A-Z0-9.\-]+$")
     trade_type: TradeType
-    quantity: Decimal
-    price: Decimal
+    quantity: Decimal = Field(..., gt=0)
+    price: Decimal = Field(..., ge=0)
     total_amount: Decimal
     executed_at: Optional[datetime] = None
     status: Optional[TradeStatus] = TradeStatus.OPEN
