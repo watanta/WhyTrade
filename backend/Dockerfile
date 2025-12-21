@@ -14,6 +14,7 @@ RUN pip install poetry
 # 依存関係のインストール
 COPY pyproject.toml poetry.lock* ./
 RUN poetry config virtualenvs.create false \
+    && poetry lock --no-update \
     && poetry install --no-interaction --no-ansi
 
 # アプリケーションコードのコピー
