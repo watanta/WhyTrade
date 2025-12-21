@@ -57,11 +57,102 @@
 WhyTrade/
 ├── docs/              # ドキュメント
 │   └── app_design.md  # アプリケーション設計書
-├── frontend/          # フロントエンドコード（予定）
-├── backend/           # バックエンドコード（予定）
-├── database/          # データベーススキーマ（予定）
-└── README.md          # このファイル
+├── frontend/          # Reactフロントエンド
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── features/
+│   │   ├── services/
+│   │   └── App.tsx
+│   ├── Dockerfile
+│   └── package.json
+├── backend/           # FastAPIバックエンド
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   └── main.py
+│   ├── Dockerfile
+│   └── pyproject.toml
+├── database/          # データベース初期化
+│   └── init.sql
+├── docker-compose.yml
+├── .env.example
+└── README.md
 ```
+
+## 🚀 セットアップ手順
+
+### 前提条件
+- Docker & Docker Compose
+- Git
+
+### 1. リポジトリのクローン
+```bash
+git clone https://github.com/watanta/WhyTrade.git
+cd WhyTrade
+```
+
+### 2. 環境変数の設定
+```bash
+cp .env.example .env
+# .envファイルを編集して、SECRET_KEYなどを変更
+```
+
+### 3. Dockerコンテナの起動
+```bash
+docker-compose up -d
+```
+
+### 4. アプリケーションへのアクセス
+- **フロントエンド**: http://localhost:3000
+- **バックエンドAPI**: http://localhost:8000
+- **API ドキュメント**: http://localhost:8000/docs
+
+### 5. コンテナの停止
+```bash
+docker-compose down
+```
+
+## 💻 ローカル開発（Docker不使用）
+
+### フロントエンド
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### バックエンド
+```bash
+cd backend
+poetry install
+poetry run uvicorn app.main:app --reload
+```
+
+### データベース
+PostgreSQL 15をローカルにインストールし、`.env`の設定に従ってデータベースを作成してください。
+
+## 📝 開発ワークフロー
+
+1. 新しいブランチを作成
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. 変更を加える
+
+3. コミット
+   ```bash
+   git add .
+   git commit -m "feat: your feature description"
+   ```
+
+4. プッシュしてプルリクエストを作成
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
 ## 🚀 開発フェーズ
 
