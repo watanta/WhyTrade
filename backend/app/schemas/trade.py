@@ -31,6 +31,15 @@ class TradeBase(BaseModel):
     confidence_level: Optional[int] = Field(None, ge=1, le=5)
     rationale: Optional[str] = None
     related_trade_id: Optional[UUID] = None
+    
+    # Enhanced entry rationale fields
+    entry_trigger: Optional[str] = None
+    target_price: Optional[Decimal] = None
+    stop_loss: Optional[Decimal] = None
+    holding_period: Optional[str] = None
+    position_sizing_rationale: Optional[str] = None
+    competitor_analysis: Optional[str] = None
+    catalyst: Optional[str] = None
 
 # Properties to receive via API on creation
 class TradeCreate(TradeBase):
@@ -54,6 +63,15 @@ class TradeUpdate(BaseModel):
     risk_reward_ratio: Optional[Decimal] = None
     confidence_level: Optional[int] = Field(None, ge=1, le=5)
     rationale: Optional[str] = None
+    
+    # Enhanced entry rationale fields
+    entry_trigger: Optional[str] = None
+    target_price: Optional[Decimal] = None
+    stop_loss: Optional[Decimal] = None
+    holding_period: Optional[str] = None
+    position_sizing_rationale: Optional[str] = None
+    competitor_analysis: Optional[str] = None
+    catalyst: Optional[str] = None
 
 # Properties to return via API
 class TradeResponse(TradeBase):

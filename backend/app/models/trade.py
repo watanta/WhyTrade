@@ -38,6 +38,15 @@ class Trade(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Enhanced entry rationale fields
+    entry_trigger = Column(Text, nullable=True)  # エントリー理由/トリガー
+    target_price = Column(Numeric(precision=20, scale=4), nullable=True)  # 目標価格
+    stop_loss = Column(Numeric(precision=20, scale=4), nullable=True)  # 損切りライン
+    holding_period = Column(String(50), nullable=True)  # 保有期間の想定 (デイトレ/スイング/中期/長期)
+    position_sizing_rationale = Column(Text, nullable=True)  # ポジションサイズの根拠
+    competitor_analysis = Column(Text, nullable=True)  # 競合他社との比較
+    catalyst = Column(Text, nullable=True)  # カタリスト（材料）
 
     user = relationship("User", back_populates="trades")
     

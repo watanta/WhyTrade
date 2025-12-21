@@ -124,6 +124,48 @@ const ReflectionDialog: React.FC<ReflectionDialogProps> = ({ open, onClose, trad
                             </Box>
 
                             <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">競合他社との比較</Typography>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {trade.competitor_analysis || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">エントリー理由/トリガー</Typography>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {trade.entry_trigger || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">カタリスト（材料）</Typography>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {trade.catalyst || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">保有期間の想定</Typography>
+                                <Typography variant="body2">
+                                    {trade.holding_period || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">目標価格</Typography>
+                                <Typography variant="body2">
+                                    {trade.target_price || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">損切りライン</Typography>
+                                <Typography variant="body2">
+                                    {trade.stop_loss || '-'}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ mb: 2 }}>
                                 <Typography variant="caption" color="text.secondary">リスクリワード比</Typography>
                                 <Typography variant="body2">
                                     {trade.risk_reward_ratio || '-'}
@@ -136,6 +178,14 @@ const ReflectionDialog: React.FC<ReflectionDialogProps> = ({ open, onClose, trad
                                     {trade.confidence_level || '-'}
                                 </Typography>
                             </Box>
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="caption" color="text.secondary">ポジションサイズの根拠</Typography>
+                                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                                    {trade.position_sizing_rationale || '-'}
+                                </Typography>
+                            </Box>
+
 
                             <Box>
                                 <Typography variant="caption" color="text.secondary">その他の根拠</Typography>

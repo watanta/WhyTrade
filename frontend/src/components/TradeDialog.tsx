@@ -34,6 +34,13 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
             risk_reward_ratio: 1,
             confidence_level: 3,
             rationale: '',
+            entry_trigger: '',
+            target_price: 0,
+            stop_loss: 0,
+            holding_period: '',
+            position_sizing_rationale: '',
+            competitor_analysis: '',
+            catalyst: '',
         },
     });
 
@@ -59,6 +66,13 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                 risk_reward_ratio: initialData.risk_reward_ratio || 1,
                 confidence_level: initialData.confidence_level || 3,
                 rationale: initialData.rationale || '',
+                entry_trigger: initialData.entry_trigger || '',
+                target_price: initialData.target_price || 0,
+                stop_loss: initialData.stop_loss || 0,
+                holding_period: initialData.holding_period || '',
+                position_sizing_rationale: initialData.position_sizing_rationale || '',
+                competitor_analysis: initialData.competitor_analysis || '',
+                catalyst: initialData.catalyst || '',
             });
         } else {
             reset({
@@ -74,6 +88,13 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                 risk_reward_ratio: 1,
                 confidence_level: 3,
                 rationale: '',
+                entry_trigger: '',
+                target_price: 0,
+                stop_loss: 0,
+                holding_period: '',
+                position_sizing_rationale: '',
+                competitor_analysis: '',
+                catalyst: '',
             });
         }
     }, [initialData, reset]);
@@ -320,6 +341,144 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 )}
                             />
                         </Grid>
+
+                        {/* Enhanced Entry Rationale Fields */}
+                        <Grid item xs={12}>
+                            <TextField
+                                label="エントリー計画"
+                                fullWidth
+                                disabled
+                                size="small"
+                                sx={{ mt: 2, bgcolor: 'action.hover' }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="entry_trigger"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="エントリー理由/トリガー"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="catalyst"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="カタリスト（材料）"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="holding_period"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label="保有期間の想定"
+                                        fullWidth
+                                    >
+                                        <MenuItem value="">未設定</MenuItem>
+                                        <MenuItem value="デイトレ">デイトレ</MenuItem>
+                                        <MenuItem value="スイング">スイング</MenuItem>
+                                        <MenuItem value="中期">中期</MenuItem>
+                                        <MenuItem value="長期">長期</MenuItem>
+                                    </TextField>
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                label="リスク管理"
+                                fullWidth
+                                disabled
+                                size="small"
+                                sx={{ mt: 2, bgcolor: 'action.hover' }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Controller
+                                name="target_price"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="目標価格"
+                                        type="number"
+                                        fullWidth
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Controller
+                                name="stop_loss"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="損切りライン"
+                                        type="number"
+                                        fullWidth
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="position_sizing_rationale"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="ポジションサイズの根拠"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="competitor_analysis"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="競合他社との比較"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                    />
+                                )}
+                            />
+                        </Grid>
+
                     </Grid>
                 </DialogContent>
                 <DialogActions>

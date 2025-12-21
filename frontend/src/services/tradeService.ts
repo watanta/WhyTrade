@@ -18,6 +18,14 @@ export interface Trade {
     confidence_level?: number;
     rationale?: string;
     related_trade_id?: string;
+    // Enhanced entry rationale fields
+    entry_trigger?: string;
+    target_price?: number;
+    stop_loss?: number;
+    holding_period?: string;
+    position_sizing_rationale?: string;
+    competitor_analysis?: string;
+    catalyst?: string;
     created_at: string;
     updated_at: string;
 }
@@ -38,6 +46,21 @@ export interface TradeCreate {
     total_amount: number;
     executed_at?: string;
     status?: 'OPEN' | 'CLOSED';
+    // Rationale fields
+    market_env?: string;
+    technical_analysis?: string;
+    fundamental_analysis?: string;
+    risk_reward_ratio?: number;
+    confidence_level?: number;
+    rationale?: string;
+    // Enhanced entry rationale fields
+    entry_trigger?: string;
+    target_price?: number;
+    stop_loss?: number;
+    holding_period?: string;
+    position_sizing_rationale?: string;
+    competitor_analysis?: string;
+    catalyst?: string;
 }
 
 export interface TradeUpdate {
@@ -49,6 +72,21 @@ export interface TradeUpdate {
     executed_at?: string;
     status?: 'OPEN' | 'CLOSED';
     profit_loss?: number;
+    // Rationale fields
+    market_env?: string;
+    technical_analysis?: string;
+    fundamental_analysis?: string;
+    risk_reward_ratio?: number;
+    confidence_level?: number;
+    rationale?: string;
+    // Enhanced entry rationale fields
+    entry_trigger?: string;
+    target_price?: number;
+    stop_loss?: number;
+    holding_period?: string;
+    position_sizing_rationale?: string;
+    competitor_analysis?: string;
+    catalyst?: string;
 }
 
 export interface TradeClose {
