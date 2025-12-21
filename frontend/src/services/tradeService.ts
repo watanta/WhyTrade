@@ -17,6 +17,7 @@ export interface Trade {
     risk_reward_ratio?: number;
     confidence_level?: number;
     rationale?: string;
+    related_trade_id?: string;
     created_at: string;
     updated_at: string;
 }

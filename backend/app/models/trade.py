@@ -40,3 +40,6 @@ class Trade(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     user = relationship("User", back_populates="trades")
+    
+    related_trade_id = Column(UUID(as_uuid=True), ForeignKey("trades.id"), nullable=True)
+    related_trade = relationship("Trade", remote_side=[id])

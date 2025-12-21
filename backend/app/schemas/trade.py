@@ -30,6 +30,7 @@ class TradeBase(BaseModel):
     risk_reward_ratio: Optional[Decimal] = None
     confidence_level: Optional[int] = Field(None, ge=1, le=5)
     rationale: Optional[str] = None
+    related_trade_id: Optional[UUID] = None
 
 # Properties to receive via API on creation
 class TradeCreate(TradeBase):

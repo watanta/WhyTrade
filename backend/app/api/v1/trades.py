@@ -184,8 +184,6 @@ def settle_trade(
     else:
         profit_loss = (trade.price - trade_close.closing_price) * trade.quantity
         
-    exit_rationale = trade_close.rationale + f"\n(自動生成: {str(trade.id)[:8]}...の決済)" if trade_close.rationale else f"決済による反対売買 (元ID: {str(trade.id)[:8]}...)"
-    
     exit_trade = models.trade.Trade(
         user_id=current_user.id,
         ticker_symbol=trade.ticker_symbol,
@@ -196,7 +194,8 @@ def settle_trade(
         executed_at=trade_close.closed_at or datetime.now(),
         status=models.trade.TradeStatus.CLOSED,
         profit_loss=profit_loss,
-        rationale=exit_rationale
+        rationale=trade_close.rationale,
+        related_trade_id=trade.id
     )
     
     db.add(trade)
