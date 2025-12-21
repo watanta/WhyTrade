@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.models.user import User # Import models to register them with Base
+from sqlalchemy import text
 
 # データベーステーブルの作成
 Base.metadata.create_all(bind=engine)

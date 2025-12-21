@@ -28,6 +28,12 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
             price: 0,
             total_amount: 0,
             executed_at: new Date().toISOString().slice(0, 16),
+            market_env: '',
+            technical_analysis: '',
+            fundamental_analysis: '',
+            risk_reward_ratio: 1,
+            confidence_level: 3,
+            rationale: '',
         },
     });
 
@@ -47,6 +53,12 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                 price: initialData.price,
                 total_amount: initialData.total_amount,
                 executed_at: new Date(initialData.executed_at).toISOString().slice(0, 16),
+                market_env: initialData.market_env || '',
+                technical_analysis: initialData.technical_analysis || '',
+                fundamental_analysis: initialData.fundamental_analysis || '',
+                risk_reward_ratio: initialData.risk_reward_ratio || 1,
+                confidence_level: initialData.confidence_level || 3,
+                rationale: initialData.rationale || '',
             });
         } else {
             reset({
@@ -56,6 +68,12 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                 price: 0,
                 total_amount: 0,
                 executed_at: new Date().toISOString().slice(0, 16),
+                market_env: '',
+                technical_analysis: '',
+                fundamental_analysis: '',
+                risk_reward_ratio: 1,
+                confidence_level: 3,
+                rationale: '',
             });
         }
     }, [initialData, reset]);
@@ -86,7 +104,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                     maxLength: { value: 10, message: '10文字以内で入力してください' },
                                     pattern: { value: /^[A-Z0-9.\-]+$/i, message: '英数字、ピリオド、ハイフンのみ使用可能です' }
                                 }}
-                                render={({ field, fieldState: { error } }) => (
+                                render={({ field, fieldState: { error } }: { field: any, fieldState: { error: any } }) => (
                                     <TextField
                                         {...field}
                                         label="銘柄コード"
@@ -95,7 +113,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                         helperText={error?.message}
                                         placeholder="例: 7203, AAPL"
                                         inputProps={{ style: { textTransform: 'uppercase' } }}
-                                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value.toUpperCase())}
                                     />
                                 )}
                             />
@@ -120,7 +138,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                     required: '約定日時は必須です',
                                     validate: (value) => new Date(value) <= new Date() || '未来の日時は選択できません'
                                 }}
-                                render={({ field, fieldState: { error } }) => (
+                                render={({ field, fieldState: { error } }: { field: any, fieldState: { error: any } }) => (
                                     <TextField
                                         {...field}
                                         label="約定日時"
@@ -141,7 +159,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                     required: '数量は必須です',
                                     min: { value: 0.000001, message: '0より大きい値を入力してください' }
                                 }}
-                                render={({ field, fieldState: { error } }) => (
+                                render={({ field, fieldState: { error } }: { field: any, fieldState: { error: any } }) => (
                                     <TextField
                                         {...field}
                                         label="数量"
@@ -161,7 +179,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                     required: '単価は必須です',
                                     min: { value: 0, message: '0以上の値を入力してください' }
                                 }}
-                                render={({ field, fieldState: { error } }) => (
+                                render={({ field, fieldState: { error } }: { field: any, fieldState: { error: any } }) => (
                                     <TextField
                                         {...field}
                                         label="単価"
@@ -184,6 +202,120 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                         type="number"
                                         fullWidth
                                         disabled
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                label="理由・根拠（セクション）"
+                                fullWidth
+                                disabled
+                                size="small"
+                                sx={{ mt: 2, bgcolor: 'action.hover' }}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="market_env"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="市場環境"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                        placeholder="例: 上昇トレンド、レンジ相場など"
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="technical_analysis"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="テクニカル分析"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                        placeholder="例: RSI売られすぎ、ダブルボトム完成など"
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="fundamental_analysis"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="ファンダメンタル分析"
+                                        fullWidth
+                                        multiline
+                                        rows={2}
+                                        placeholder="例: 好決算、上方修正期待など"
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Controller
+                                name="risk_reward_ratio"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="リスクリワード比"
+                                        type="number"
+                                        fullWidth
+                                        inputProps={{ step: 0.1 }}
+                                    />
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Controller
+                                name="confidence_level"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label="確信度 (1-5)"
+                                        fullWidth
+                                    >
+                                        {[1, 2, 3, 4, 5].map((val) => (
+                                            <MenuItem key={val} value={val}>
+                                                {val === 5 ? '5 (最高)' : val === 1 ? '1 (最低)' : val}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                )}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Controller
+                                name="rationale"
+                                control={control}
+                                render={({ field }: { field: any }) => (
+                                    <TextField
+                                        {...field}
+                                        label="総合的な売買根拠"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
                                     />
                                 )}
                             />

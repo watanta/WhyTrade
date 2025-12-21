@@ -126,6 +126,7 @@ const TradesPage: React.FC = () => {
                             <TableCell align="right">数量</TableCell>
                             <TableCell align="right">単価</TableCell>
                             <TableCell align="right">損益</TableCell>
+                            <TableCell>確信度/根拠</TableCell>
                             <TableCell>約定日時</TableCell>
                             <TableCell>状態</TableCell>
                             <TableCell align="center">アクション</TableCell>
@@ -134,12 +135,12 @@ const TradesPage: React.FC = () => {
                     <TableBody>
                         {trades.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={8} align="center">
+                                <TableCell colSpan={9} align="center">
                                     取引がありません。「新規取引登録」から登録してください。
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            trades.map((trade) => (
+                            trades.map((trade: Trade) => (
                                 <TableRow key={trade.id}>
                                     <TableCell sx={{ fontWeight: 'bold' }}>{trade.ticker_symbol}</TableCell>
                                     <TableCell>
@@ -153,7 +154,7 @@ const TradesPage: React.FC = () => {
                                     <TableCell align="right">{trade.quantity.toLocaleString()}</TableCell>
                                     <TableCell align="right">{trade.price.toLocaleString()}</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-                                        {trade.profit_loss !== null ? (
+                                        {trade.profit_loss != null ? (
                                             <Typography
                                                 component="span"
                                                 color={trade.profit_loss >= 0 ? 'success.main' : 'error.main'}
@@ -164,6 +165,45 @@ const TradesPage: React.FC = () => {
                                         ) : (
                                             '-'
                                         )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Box sx={{ display: 'flex', color: 'gold', mr: 1 }}>
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <Box
+                                                        key={star}
+                                                        component="span"
+                                                        sx={{
+                                                            fontSize: '0.8rem',
+                                                            opacity: star <= (trade.confidence_level || 0) ? 1 : 0.2
+                                                        }}
+                                                    >
+                                                        ★
+                                                    </Box>
+                                                ))}
+                                            </Box>
+                                            {(trade.rationale || trade.market_env) && (
+                                                <Tooltip
+                                                    title={
+                                                        <Box sx={{ p: 1 }}>
+                                                            {trade.market_env && <Typography variant="caption" display="block">市場: {trade.market_env}</Typography>}
+                                                            {trade.rationale && <Typography variant="caption" display="block">根拠: {trade.rationale}</Typography>}
+                                                        </Box>
+                                                    }
+                                                >
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            textDecoration: 'underline',
+                                                            cursor: 'help',
+                                                            color: 'text.secondary'
+                                                        }}
+                                                    >
+                                                        詳細
+                                                    </Typography>
+                                                </Tooltip>
+                                            )}
+                                        </Box>
                                     </TableCell>
                                     <TableCell>{new Date(trade.executed_at).toLocaleString()}</TableCell>
                                     <TableCell>

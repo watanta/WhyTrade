@@ -23,6 +23,14 @@ class TradeBase(BaseModel):
     executed_at: Optional[datetime] = None
     status: Optional[TradeStatus] = TradeStatus.OPEN
 
+    # Rationale fields
+    market_env: Optional[str] = None
+    technical_analysis: Optional[str] = None
+    fundamental_analysis: Optional[str] = None
+    risk_reward_ratio: Optional[Decimal] = None
+    confidence_level: Optional[int] = Field(None, ge=1, le=5)
+    rationale: Optional[str] = None
+
 # Properties to receive via API on creation
 class TradeCreate(TradeBase):
     pass
@@ -37,6 +45,14 @@ class TradeUpdate(BaseModel):
     executed_at: Optional[datetime] = None
     status: Optional[TradeStatus] = None
     profit_loss: Optional[Decimal] = None
+    
+    # Rationale fields
+    market_env: Optional[str] = None
+    technical_analysis: Optional[str] = None
+    fundamental_analysis: Optional[str] = None
+    risk_reward_ratio: Optional[Decimal] = None
+    confidence_level: Optional[int] = Field(None, ge=1, le=5)
+    rationale: Optional[str] = None
 
 # Properties to return via API
 class TradeResponse(TradeBase):

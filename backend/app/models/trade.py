@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, ForeignKey, DateTime, Enum, Numeric, func
+from sqlalchemy import Column, String, ForeignKey, DateTime, Enum, Numeric, func, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import enum
@@ -27,6 +27,15 @@ class Trade(Base):
     executed_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     status = Column(Enum(TradeStatus), default=TradeStatus.OPEN, nullable=False)
     profit_loss = Column(Numeric(precision=20, scale=4), nullable=True)
+    
+    # Rationale fields
+    market_env = Column(Text, nullable=True)
+    technical_analysis = Column(Text, nullable=True)
+    fundamental_analysis = Column(Text, nullable=True)
+    risk_reward_ratio = Column(Numeric(precision=10, scale=2), nullable=True)
+    confidence_level = Column(Integer, nullable=True) # 1-5
+    rationale = Column(Text, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

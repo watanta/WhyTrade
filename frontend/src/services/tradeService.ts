@@ -10,9 +10,15 @@ export interface Trade {
     total_amount: number;
     executed_at: string;
     status: 'OPEN' | 'CLOSED';
-    profit_loss: number | null;
+    profit_loss?: number;
+    market_env?: string;
+    technical_analysis?: string;
+    fundamental_analysis?: string;
+    risk_reward_ratio?: number;
+    confidence_level?: number;
+    rationale?: string;
     created_at: string;
-    updated_at: string | null;
+    updated_at: string;
 }
 
 export interface TradeCreate {
