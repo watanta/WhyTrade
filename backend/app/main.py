@@ -32,7 +32,8 @@ async def health_check():
     return {"status": "healthy"}
 
 # APIルーターをここに追加
-from app.api.v1 import auth, trades, reflections
+from app.api.v1 import auth, trades, reflections, stock
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(trades.router, prefix=f"{settings.API_V1_STR}/trades", tags=["trades"])
 app.include_router(reflections.router, prefix=f"{settings.API_V1_STR}/reflections", tags=["reflections"])
+app.include_router(stock.router, prefix=f"{settings.API_V1_STR}/stock", tags=["stock"])

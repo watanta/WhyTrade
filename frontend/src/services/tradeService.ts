@@ -170,6 +170,17 @@ const tradeService = {
         const response = await apiClient.put(`/reflections/${tradeId}/reflection`, data);
         return response.data;
     },
+
+    getStockPrice: async (tickerSymbol: string) => {
+        const response = await apiClient.get<{
+            ticker_symbol: string;
+            price: number;
+            currency: string;
+            timestamp: string;
+            source: string;
+        }>(`/stock/price/${tickerSymbol}`);
+        return response.data;
+    },
 };
 
 export default tradeService;

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
     Dialog,
@@ -10,7 +10,7 @@ import {
     MenuItem,
     Grid,
 } from '@mui/material';
-import { Trade, TradeCreate } from '../services/tradeService';
+import tradeService, { Trade, TradeCreate } from '../services/tradeService';
 
 interface TradeDialogProps {
     open: boolean;
@@ -48,6 +48,40 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
     const price = watch('price');
     const targetPrice = watch('target_price');
     const stopLoss = watch('stop_loss');
+    const tickerSymbol = watch('ticker_symbol');
+
+    const [isFetchingPrice, setIsFetchingPrice] = useState(false);
+    const [priceSourceInfo, setPriceSourceInfo] = useState('');
+
+    useEffect(() => {
+        if (!tickerSymbol || tickerSymbol.length < 4) {
+            setPriceSourceInfo('');
+            return;
+        }
+
+        // Skip fetching if it matches initial data on load (optional, but good for UX)
+        if (initialData && initialData.ticker_symbol === tickerSymbol && price > 0) {
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            setIsFetchingPrice(true);
+            setPriceSourceInfo('株価取得中...');
+            try {
+                const data = await tradeService.getStockPrice(tickerSymbol);
+                setValue('price', data.price);
+                const sourceText = data.source === 'last_price' ? '現在値' : '終値';
+                setPriceSourceInfo(`${sourceText}: ${data.price} (${new Date(data.timestamp).toLocaleTimeString()})`);
+            } catch (error) {
+                console.error("Failed to fetch price", error);
+                setPriceSourceInfo('株価取得失敗: コードを確認してください');
+            } finally {
+                setIsFetchingPrice(false);
+            }
+        }, 1000); // 1 second debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [tickerSymbol, setValue, initialData]);
 
     useEffect(() => {
         setValue('total_amount', (quantity || 0) * (price || 0));
@@ -230,7 +264,11 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                         type="number"
                                         fullWidth
                                         error={!!error}
-                                        helperText={error?.message}
+                                        helperText={error?.message || priceSourceInfo}
+                                        disabled={isFetchingPrice}
+                                        InputProps={{
+                                            endAdornment: isFetchingPrice ? <span style={{ fontSize: '12px', color: 'gray' }}>取得中...</span> : null
+                                        }}
                                     />
                                 )}
                             />
