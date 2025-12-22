@@ -245,6 +245,7 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                         fullWidth
                                         error={!!error}
                                         helperText={error?.message}
+                                        inputProps={{ step: 100 }}
                                     />
                                 )}
                             />
