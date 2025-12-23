@@ -376,6 +376,14 @@ class StockService:
                         "is_met": False
                     })
 
+                # [ ] Confirm several years of earnings
+                checklist["fundamental"].append({
+                    "label": "数年の決算を確認したこと",
+                    "value": 0.0,
+                    "text": "過去数年分の売上・営業利益の推移、キャッシュフロー等を確認しましたか？\n💡通期予想の修正履歴も重要です。",
+                    "is_met": False
+                })
+
             except Exception as e:
                 logger.error(f"Fundamental analysis error: {e}")
                 checklist["fundamental"].append({
