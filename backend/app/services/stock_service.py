@@ -384,6 +384,16 @@ class StockService:
                     "is_met": False
                 })
 
+                # [ ] Market Consensus Check
+                ticker_only = ticker_symbol.split('.')[0] if '.' in ticker_symbol else ticker_symbol
+                checklist["fundamental"].append({
+                    "label": "市場コンセンサスを確認したか",
+                    "value": 0.0,
+                    "text": "目標株価、アナリスト予想、コンセンサスの推移を確認しましたか？",
+                    "url": f"https://kabuyoho.jp/reportTarget?bcode={ticker_only}",
+                    "is_met": False
+                })
+
             except Exception as e:
                 logger.error(f"Fundamental analysis error: {e}")
                 checklist["fundamental"].append({

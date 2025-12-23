@@ -128,6 +128,7 @@ export interface ChecklistItem {
     label: string;
     value: any;
     text: string;
+    url?: string;
     is_met: boolean;
 }
 

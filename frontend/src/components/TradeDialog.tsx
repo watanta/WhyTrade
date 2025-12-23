@@ -600,7 +600,20 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                                 }
                                                 label={
                                                     <Box>
-                                                        <Typography variant="body2" fontWeight="bold">{item.label}</Typography>
+                                                        <Typography variant="body2" fontWeight="bold">
+                                                            {item.label}
+                                                            {item.url && (
+                                                                <Button
+                                                                    size="small"
+                                                                    href={item.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    sx={{ ml: 1, minWidth: 'auto', p: 0, fontSize: '0.75rem' }}
+                                                                >
+                                                                    [詳細を外部サイトで確認]
+                                                                </Button>
+                                                            )}
+                                                        </Typography>
                                                         <Typography variant="caption" color="textSecondary">{item.text}</Typography>
                                                     </Box>
                                                 }
@@ -623,7 +636,20 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                                 }
                                                 label={
                                                     <Box>
-                                                        <Typography variant="body2" fontWeight="bold">{item.label}</Typography>
+                                                        <Typography variant="body2" fontWeight="bold">
+                                                            {item.label}
+                                                            {item.url && (
+                                                                <Button
+                                                                    size="small"
+                                                                    href={item.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    sx={{ ml: 1, minWidth: 'auto', p: 0, fontSize: '0.75rem' }}
+                                                                >
+                                                                    [詳細を外部サイトで確認]
+                                                                </Button>
+                                                            )}
+                                                        </Typography>
                                                         <Typography variant="caption" color="textSecondary">{item.text}</Typography>
                                                     </Box>
                                                 }
@@ -646,7 +672,20 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                                 }
                                                 label={
                                                     <Box>
-                                                        <Typography variant="body2" fontWeight="bold">{item.label}</Typography>
+                                                        <Typography variant="body2" fontWeight="bold">
+                                                            {item.label}
+                                                            {item.url && (
+                                                                <Button
+                                                                    size="small"
+                                                                    href={item.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    sx={{ ml: 1, minWidth: 'auto', p: 0, fontSize: '0.75rem' }}
+                                                                >
+                                                                    [詳細を外部サイトで確認]
+                                                                </Button>
+                                                            )}
+                                                        </Typography>
                                                         <Typography variant="caption" color="textSecondary">{item.text}</Typography>
                                                     </Box>
                                                 }
