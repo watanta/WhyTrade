@@ -124,6 +124,21 @@ export interface ReflectionUpdate {
     satisfaction_rating?: number;
 }
 
+export interface ChecklistItem {
+    label: string;
+    value: any;
+    text: string;
+    is_met: boolean;
+}
+
+export interface StockAnalysis {
+    checklist: {
+        market: ChecklistItem[];
+        technical: ChecklistItem[];
+        fundamental: ChecklistItem[];
+    };
+}
+
 const tradeService = {
     getTrades: async () => {
         const response = await apiClient.get<Trade[]>('/trades/');
@@ -179,6 +194,11 @@ const tradeService = {
             timestamp: string;
             source: string;
         }>(`/stock/price/${tickerSymbol}`);
+        return response.data;
+    },
+
+    getStockAnalysis: async (tickerSymbol: string): Promise<StockAnalysis> => {
+        const response = await apiClient.get<StockAnalysis>(`/stock/analysis/${tickerSymbol}`);
         return response.data;
     },
 };
