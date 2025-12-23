@@ -9,6 +9,9 @@ import {
     TextField,
     MenuItem,
     Grid,
+    Typography,
+    Divider,
+    Tooltip,
 } from '@mui/material';
 import tradeService, { Trade, TradeCreate } from '../services/tradeService';
 
@@ -290,14 +293,11 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <TextField
-                                label="理由・根拠（セクション）"
-                                fullWidth
-                                disabled
-                                size="small"
-                                sx={{ mt: 2, bgcolor: 'action.hover' }}
-                            />
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                理由・根拠
+                            </Typography>
+                            <Divider />
                         </Grid>
 
                         <Grid item xs={12}>
@@ -305,14 +305,16 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="market_env"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="市場環境"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                        placeholder="例: 上昇トレンド、レンジ相場など"
-                                    />
+                                    <Tooltip title="現在の市場全体のトレンド（上昇・下降・レンジ）や地合いの強弱を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="市場環境"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            placeholder="例: 上昇トレンド、レンジ相場など"
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
@@ -322,14 +324,16 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="technical_analysis"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="テクニカル分析"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                        placeholder="例: RSI売られすぎ、ダブルボトム完成など"
-                                    />
+                                    <Tooltip title="チャートパターン、インジケーター（RSI, MACD等）、移動平均線などの分析結果を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="テクニカル分析"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            placeholder="例: RSI売られすぎ、ダブルボトム完成など"
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
@@ -339,14 +343,16 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="fundamental_analysis"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="ファンダメンタル分析"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                        placeholder="例: 好決算、上方修正期待など"
-                                    />
+                                    <Tooltip title="業績、決算内容、割安・割高判断（PER, PBR）などの分析を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="ファンダメンタル分析"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            placeholder="例: 好決算、上方修正期待など"
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
@@ -379,26 +385,26 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="rationale"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="総合的な売買根拠"
-                                        fullWidth
-                                        multiline
-                                        rows={3}
-                                    />
+                                    <Tooltip title="市場環境・テクニカル・ファンダメンタルを統合した、このトレードの全体的なシナリオを入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="トレードシナリオ・総合判断"
+                                            placeholder="例: 上昇トレンド継続中かつ好材料が出たため、短期での上値追いを狙う。リスクリワードも良好。"
+                                            fullWidth
+                                            multiline
+                                            rows={3}
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
 
                         {/* Enhanced Entry Rationale Fields */}
-                        <Grid item xs={12}>
-                            <TextField
-                                label="エントリー計画"
-                                fullWidth
-                                disabled
-                                size="small"
-                                sx={{ mt: 2, bgcolor: 'action.hover' }}
-                            />
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                エントリー計画
+                            </Typography>
+                            <Divider />
                         </Grid>
 
                         <Grid item xs={12}>
@@ -406,13 +412,16 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="entry_trigger"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="エントリー理由/トリガー"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                    />
+                                    <Tooltip title="「今」このタイミングでエントリーした具体的なきっかけ（ブレイクアウト、押し目、など）を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="エントリートリガー"
+                                            placeholder="例: 25日移動平均線での反発を確認、出来高急増、ゴールデンクロスなど"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
@@ -422,13 +431,15 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="catalyst"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="カタリスト（材料）"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                    />
+                                    <Tooltip title="株価変動のきっかけとなる材料（ニュース、決算発表、政策変更など）を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="カタリスト（材料）"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
@@ -454,14 +465,11 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <TextField
-                                label="リスク管理"
-                                fullWidth
-                                disabled
-                                size="small"
-                                sx={{ mt: 2, bgcolor: 'action.hover' }}
-                            />
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                                リスク管理
+                            </Typography>
+                            <Divider />
                         </Grid>
 
                         <Grid item xs={6}>
@@ -516,32 +524,20 @@ const TradeDialog: React.FC<TradeDialogProps> = ({ open, onClose, onSubmit, init
                                 name="position_sizing_rationale"
                                 control={control}
                                 render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="ポジションサイズの根拠"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                    />
+                                    <Tooltip title="なぜこの株数（ロット）にしたのか、資金管理の観点からの理由を入力します。" arrow placement="top">
+                                        <TextField
+                                            {...field}
+                                            label="ポジションサイズの根拠"
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                        />
+                                    </Tooltip>
                                 )}
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <Controller
-                                name="competitor_analysis"
-                                control={control}
-                                render={({ field }: { field: any }) => (
-                                    <TextField
-                                        {...field}
-                                        label="競合他社との比較"
-                                        fullWidth
-                                        multiline
-                                        rows={2}
-                                    />
-                                )}
-                            />
-                        </Grid>
+
 
                     </Grid>
                 </DialogContent>
